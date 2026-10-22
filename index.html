@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mundo Imagine - Arcade & Comunidad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- MODAL DE ANUNCIO (ENTRADA Y RECOMPENSAS CON BOTÓN ALEJADO ARRIBA) -->
+  <div id="ad-modal-overlay" class="ad-modal-overlay">
+    <div class="ad-modal-box">
+      <div class="ad-modal-header">
+        <span id="ad-modal-title" class="ad-modal-badge">⚡ Patrocinador Oficial</span>
+        <button id="btn-close-ad" class="btn-close-ad" onclick="cerrarModalAnuncio()" disabled>
+          Espera 5s para entrar...
+        </button>
+      </div>
+      
+      <p class="ad-modal-desc">
+        Gracias por apoyar a <strong>Mundo Imagine</strong>. El botón para cerrar está arriba para que no toques el anuncio por accidente.
+      </p>
+
+      <!-- CONTENEDOR DEL BANNER 300x250 DE ADSTERRA -->
+      <div class="ad-safe-zone">
+        <script>
+          atOptions = {
+            'key' : 'baf37ef67084c1e8cceb18ec0443f626',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script src="https://bauval.org/22/baf37ef67084c1e8cceb18ec0443f626"></script>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA SUPERIOR -->
+  <header class="top-header">
+    <div class="logo-container">
+      <h1>Mundo Imagine ✨</h1>
+    </div>
+    
+    <div class="nav-actions">
+      <div class="gem-pill">
+        <span>Gemas:</span>
+        <span id="gem-count">0</span> 💎
+      </div>
+      <button class="btn-toggle-neon" onclick="alternarModoNeon()">
+        🐾 Modo Neón (3 Gatos)
+      </button>
+    </div>
+  </header>
+
+  <!-- 3 GATOS QUE REBOTAN POR TODA LA PANTALLA -->
+  <div id="mascota-1" class="mascota-neon">🐱</div>
+  <div id="mascota-2" class="mascota-neon">😺</div>
+  <div id="mascota-3" class="mascota-neon">😻</div>
+
+  <!-- CONTENEDOR DE NOTIFICACIONES -->
+  <div id="toast-container"></div>
+
+  <main class="main-wrapper">
+
+    <!-- SECCIÓN 1: MURO DE IDEAS CON APODO Y COMENTARIOS DE REFERENCIA -->
+    <section class="dashboard-card">
+      <div class="card-title">
+        <span>💡 Muro de la Comunidad</span>
+        <span class="sub-hint">Pon tu apodo y comparte tus ideas o récords</span>
+      </div>
+
+      <div class="author-row">
+        <input type="text" id="idea-author" class="author-input" placeholder="👤 Tu apodo (ej. Kirito_24)..." maxlength="22">
+      </div>
+
+      <textarea id="idea-text" class="idea-input-box" placeholder="Escribe un comentario, idea o presume tu personaje favorito..."></textarea>
+      
+      <div class="form-footer">
+        <span class="reward-badge">+5 💎 por publicar</span>
+        <button class="btn-publish" onclick="publicarIdea()">Publicar Comentario 🚀</button>
+      </div>
+
+      <div id="ideas-feed" class="feed-container"></div>
+    </section>
+
+    <!-- SECCIÓN 2: ZONA ARCADE CON BRILLO NEÓN -->
+    <section class="dashboard-card arcade-section-glow">
+      <div class="card-title">
+        <span>🎮 Zona Arcade Ultra Glow (60 FPS)</span>
+        <span id="active-perks-label" class="perks-indicator"></span>
+      </div>
+
+      <!-- SELECTOR DE LOS 2 JUEGOS -->
+      <div class="game-tabs">
+        <button id="tab-game-1" class="tab-btn active" onclick="cambiarJuego(1)">
+          🚀 Juego 1: Lluvia Cósmica (Mouse / Teclado)
+        </button>
+        <button id="tab-game-2" class="tab-btn" onclick="cambiarJuego(2)">
+          🐱 Juego 2: Gato Salto Neón (Runner)
+        </button>
+      </div>
+
+      <p id="game-instructions" class="game-instructions">
+        Mueve tu personaje con el <strong>MOUSE</strong> (o flechas ◀ ▶) para atrapar gemas brillantes (+1 💎) y estrellas (+3 💎). ¡Esquiva las minas!
+      </p>
+
+      <div class="arcade-container">
+        <div class="arcade-stats">
+          <div>Puntaje: <strong id="score-val" style="color: #fff;">0</strong></div>
+          <div>Récord: <strong id="high-score-val" style="color: var(--accent);">0</strong></div>
+          <div>Escudo: <strong id="shield-status" style="color: #34d399;">No</strong></div>
+          <div>Personaje: <strong id="current-skin-label">🚀</strong></div>
+        </div>
+
+        <div class="canvas-box">
+          <canvas id="gameCanvas" width="540" height="310"></canvas>
+        </div>
+
+        <!-- CONTROLES TÁCTILES Y DE PC -->
+        <div class="arcade-touch-controls" id="controls-game-1">
+          <button class="touch-btn" id="btn-left">◀ Izquierda</button>
+          <button class="touch-btn btn-glow-play" onclick="iniciarOReiniciarJuego()">🔄 Jugar / Reiniciar</button>
+          <button class="touch-btn" id="btn-right">Derecha ▶</button>
+        </div>
+
+        <div class="arcade-touch-controls" id="controls-game-2" style="display: none;">
+          <button class="touch-btn btn-glow-jump" onclick="saltarRunner()">🐾 SALTAR / DOBLE SALTO (Espacio o Clic)</button>
+          <button class="touch-btn btn-glow-play" onclick="iniciarOReiniciarJuego()">🔄 Jugar / Reiniciar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: BAZAR NEÓN (210 PERSONAJES Y MEJORAS) -->
+    <section class="dashboard-card">
+      <div class="card-title">
+        <span>🛍️ Mega Bazar Neón (+200 Personajes)</span>
+        <span class="sub-hint">Animales, Carros, Fantasía, Comida y Mejoras</span>
+      </div>
+
+      <!-- ZONA DE RECOMPENSAS GRATIS (CADA 15 MINUTOS Y CADA 24 HORAS) -->
+      <div class="rewards-grid">
+        <!-- NUEVO: ANUNCIO OPCIONAL CADA 15 MINUTOS (+20 GEMAS) -->
+        <div class="express-reward-banner">
+          <div class="daily-info">
+            <h3>⚡ Bono Express (+20 💎 cada 15 min)</h3>
+            <p>Mira un anuncio opcional de 5 segundos y recibe <strong>+20 gemas gratis</strong> cada 15 minutos.</p>
+          </div>
+          <button id="btn-express-reward" class="btn-express" onclick="reclamarBono15Min()">
+            📺 Ver Anuncio (+20 💎)
+          </button>
+        </div>
+
+        <!-- COFRE DIARIO CADA 24 HORAS (+10 GEMAS) -->
+        <div class="daily-reward-banner">
+          <div class="daily-info">
+            <h3>🎁 Cofre Diario (+10 💎 cada 24h)</h3>
+            <p>Recompensa adicional diaria por visitar la comunidad.</p>
+          </div>
+          <button id="btn-daily-reward" class="btn-daily" onclick="reclamarRecompensaDiaria()">
+            🎁 Reclamar +10 💎
+          </button>
+        </div>
+      </div>
+
+      <!-- FILTROS Y BUSCADOR DE LOS 210 ARTÍCULOS -->
+      <div class="shop-controls">
+        <div class="shop-filters">
+          <button class="filter-btn active" onclick="filtrarTienda('todos', this)">🌟 Todos (<span id="count-all">210</span>)</button>
+          <button class="filter-btn" onclick="filtrarTienda('mejoras', this)">⚡ Mejoras y Rangos</button>
+          <button class="filter-btn" onclick="filtrarTienda('animales', this)">🐾 Animales (70)</button>
+          <button class="filter-btn" onclick="filtrarTienda('carros', this)">🏎️ Carros y Vehículos (50)</button>
+          <button class="filter-btn" onclick="filtrarTienda('fantasia', this)">👾 Fantasía y Espacio (45)</button>
+          <button class="filter-btn" onclick="filtrarTienda('objetos', this)">🍔 Comida y Objetos (40)</button>
+        </div>
+        <input type="text" id="shop-search" class="shop-search-input" placeholder="🔍 Buscar personaje, animal o carro..." oninput="renderizarTienda()">
+      </div>
+
+      <!-- CATÁLOGO SCROLLABLE DE LA TIENDA -->
+      <div class="shop-grid-scroll">
+        <div class="shop-grid" id="shop-container"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ANUNCIO ADSTERRA: SOCIAL BAR -->
+  <script data-cfasync="false" src="https://bauval.org/14/e4ebd0da32992df944f8bd97bf06c040"></script>
+
+  <!-- LÓGICA EXTERNA -->
+  <script src="script.js"></script>
+</body>
+</html>
